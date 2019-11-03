@@ -1,0 +1,10 @@
+{application,bstk,
+             [{applications,[kernel,stdlib,elixir,logger]},
+              {description,"bstk"},
+              {modules,['Elixir.Bstk','Elixir.Bstk.Application',
+                        'Elixir.Bstk.Board','Elixir.Bstk.BoardRules',
+                        'Elixir.Bstk.BoardServer','Elixir.Bstk.Coordinate',
+                        'Elixir.Bstk.Player','Elixir.Bstk.Tile']},
+              {registered,[]},
+              {vsn,"0.1.0"},
+              {mod,{'Elixir.Bstk.Application',[]}}]}.
