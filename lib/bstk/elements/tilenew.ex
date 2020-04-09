@@ -19,22 +19,23 @@ defmodule Bstk.TileNew do
     end
   end
 
-  defp add_coordinates(offsets, upper_left) do
-    Enum.reduce_while(offsets, MapSet.new(), fn offset, acc ->
-      add_coordinate(acc, upper_left, offset)
-    end)
-  end
+  #defp add_coordinates(offsets, upper_left) do
+  #  Enum.reduce_while(offsets, MapSet.new(), fn offset, acc ->
+  #    add_coordinate(acc, upper_left, offset)
+  #  end)
+  #end
 
-  defp add_coordinate(coordinates, %Coord{x: x, y: y}, %Coord{x: offset_x, y: offset_y}) do
+  #defp add_coordinate(_coordinates, %Coord{x: x, y: y}, %Coord{x: _offset_x, y: _offset_y}) do
       # case %Coord{x + offset_x, y + offset_y} do
       #   {:ok, coordinate}               ->
       #     {:cont, MapSet.put(coordinates, coordinate)}
       #   {:error, :invalid_coordinate}   ->
       #     {:halt, {:error, :invalid_coordinate}}
       # end
-  end
+  #end
   #def dup(%TileNew{tile_hash: tile_hash, type: type, coordinates: _, placement: {placed, coord}}) do
 
+  @spec tile_dimensions(any) :: {:error | 1 | 2 | 3, :invalid_tile_type | 1 | 2 | 3 | 4}
   def tile_dimensions(:token), do: {1, 1}
   def tile_dimensions(:sticker), do: {2, 2}
   def tile_dimensions(:card), do: {3, 4}

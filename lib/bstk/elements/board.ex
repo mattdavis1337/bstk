@@ -1,12 +1,15 @@
-defmodule Bstk.BoardNew do
-  alias Bstk.{BoardNew, TileNew, TileSlot}
-  defstruct [:board_name, :tile_slots, :tiles, :creator_hash]
+defmodule Bstk.Board do
+  alias Bstk.{Board, TileNew, TileSlot}
+  defstruct [:board_name, :width, :height, :tile_slots, :tiles, :creator_hash, :players]
 
-  def new(x, y, creator_hash), do:
-    %BoardNew{board_name: genhash(16),
+  def new(x, y, board_name, creator_hash), do:
+    %Board{board_name: board_name,
+              width: x,
+              height: y,
               tile_slots: map_tile_slots(offset_coords(x, y)),
               tiles: %{},
-              creator_hash: creator_hash}
+              creator_hash: creator_hash,
+              players: %{}}
 
 
   def place_tile(board, %TileNew{} = new_tile, {x, y}) do
@@ -37,6 +40,21 @@ defmodule Bstk.BoardNew do
       {:error, :no_tile_there} -> {:error, :no_tile_there}
     end
   end
+
+  #defp populate_board(_board, _layout) do
+
+    #{:ok, board} = Board.place_tile(board, tile, {4, 5})
+
+    #Enum.each(1..(board.x), fn x -> Enum.each(1..(board.y), fn y -> place_tile(board, TileNew.new(:token), {x, y} )))
+
+
+    #place_tile(board, )
+
+    # def tile_dimensions(:token), do: {1, 1}
+    # def tile_dimensions(:sticker), do: {2, 2}
+    # def tile_dimensions(:card), do: {3, 4}
+    # def tile_dimensions(:big_sticker), do: {3, 3}
+  #end
 
   defp add_tile_to_board(board, new_tile, {x, y}) do
     tile_slots = TileNew.tile_dimensions(new_tile.type)
@@ -77,6 +95,7 @@ defmodule Bstk.BoardNew do
     Enum.reduce(slots, [], fn cur_slot, acc -> if (cur_slot.tile_hash == tile_hash), do: [cur_slot | acc], else: acc end)
   end
 
+
   defp get_adjacent_slots(board, {x, y}, r) when r >= 1 do
     [Map.get(board.tile_slots, {x-r, y-r}) |
     [Map.get(board.tile_slots, {x, y-r}) |
@@ -89,7 +108,7 @@ defmodule Bstk.BoardNew do
     [] ] ] ] ] ] ] ] ]
   end
 
-  defp get_adjacent_slots(board, {x, y}, _r \\ 0) do
+  defp get_adjacent_slots(board, {x, y}, _r) do
     [Map.get(board.tile_slots, {x, y})]
   end
 

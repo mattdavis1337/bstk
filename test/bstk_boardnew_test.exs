@@ -1,11 +1,10 @@
 defmodule BstkTestNew do
   use ExUnit.Case
-  alias Bstk.{BoardNew, TileNew}
+  alias Bstk.{Board, TileNew}
   doctest Bstk
 
-
   test "a board is created with 864 tile slots" do
-    board = BoardNew.new(36, 24, "dumbhash")
+    board = Board.new(36, 24, "dumbhash", "system")
 
     tile_slot = Map.get(board.tile_slots, {30, 12})
     assert tile_slot.x == 30 && tile_slot.y == 12
@@ -23,7 +22,7 @@ defmodule BstkTestNew do
   end
 
   test "a board is created with 1111 tile slots" do
-    board = BoardNew.new(101, 11, "dumbhash")
+    board = Board.new(101, 11, "dumbhash", "system")
 
     tile_slot = Map.get(board.tile_slots, {30, 7})
     assert tile_slot.x == 30 && tile_slot.y == 7
@@ -49,123 +48,122 @@ defmodule BstkTestNew do
   end
 
   test "a sticker tile is placed on a board" do
-    board = BoardNew.new(36, 24, "dumbhash")
+    board = Board.new(36, 24, "dumbhash", "system")
     {:ok, tile} = TileNew.new(:sticker)
 
     assert nil == Map.get(board.tile_slots, {4, 5}).tile_hash
-    {:ok, board} = BoardNew.place_tile(board, tile, {4, 5})
+    {:ok, board} = Board.place_tile(board, tile, {4, 5})
     assert tile.tile_hash == Map.get(board.tile_slots, {4, 5}).tile_hash
   end
 
   test "tiles can not overlap" do
-    board = BoardNew.new(36, 24, "dumbhash")
+    board = Board.new(36, 24, "dumbhash", "system")
     {:ok, tile} = TileNew.new(:sticker)
     {:ok, tile2} = TileNew.new(:card)
 
     assert nil == Map.get(board.tile_slots, {4, 5}).tile_hash
-    {:ok, board} = BoardNew.place_tile(board, tile, {4, 5})
+    {:ok, board} = Board.place_tile(board, tile, {4, 5})
     assert tile.tile_hash == Map.get(board.tile_slots, {4, 5}).tile_hash
-    {:error, msg} = BoardNew.place_tile(board, tile2, {2, 2})
+    {:error, msg} = Board.place_tile(board, tile2, {2, 2})
     assert msg == :overlapping_tile
   end
 
   test "tiles can't go over edge" do
-    board = BoardNew.new(36, 24, "dumbhash")
+    board = Board.new(36, 24, "dumbhash", "system")
     {:ok, tile} = TileNew.new(:sticker)
     {:ok, tile2} = TileNew.new(:card)
 
     assert nil == Map.get(board.tile_slots, {4, 5}).tile_hash
-    {:ok, board} = BoardNew.place_tile(board, tile, {4, 5})
+    {:ok, board} = Board.place_tile(board, tile, {4, 5})
     assert tile.tile_hash == Map.get(board.tile_slots, {4, 5}).tile_hash
-    {:error, msg} = BoardNew.place_tile(board, tile2, {33, 22})
+    {:error, msg} = Board.place_tile(board, tile2, {33, 22})
     assert msg == :overlapping_tile
   end
 
   test "retrieve a tile at a specific coordinate" do
-    board = BoardNew.new(36, 24, "dumbhash")
+    board = Board.new(36, 24, "dumbhash", "system")
     {:ok, tile} = TileNew.new(:sticker)
     {:ok, tile2} = TileNew.new(:card)
 
-    {:ok, board} = BoardNew.place_tile(board, tile, {4, 5})
-    {:ok, board} = BoardNew.place_tile(board, tile2, {20, 15})
+    {:ok, board} = Board.place_tile(board, tile, {4, 5})
+    {:ok, board} = Board.place_tile(board, tile2, {20, 15})
 
-    {:ok, picked_tile} = BoardNew.pick_tile(board, {5, 6})
+    {:ok, picked_tile} = Board.pick_tile(board, {5, 6})
     assert picked_tile.tile_hash == tile.tile_hash
-    {:ok, picked_tile} = BoardNew.pick_tile(board, {21, 16})
+    {:ok, picked_tile} = Board.pick_tile(board, {21, 16})
     assert picked_tile.tile_hash == tile2.tile_hash
-    {:ok, picked_tile2} = BoardNew.pick_tile(board, {22, 18})
+    {:ok, picked_tile2} = Board.pick_tile(board, {22, 18})
     assert picked_tile2.tile_hash == picked_tile.tile_hash
-    {:error, msg} = BoardNew.pick_tile(board, {0, 1})
+    {:error, msg} = Board.pick_tile(board, {0, 1})
     assert msg == :no_tile_there
   end
 
   test "remove a tile at a specific coordinate and return the tile" do
-    board = BoardNew.new(10, 10, "dumbhash")
+    board = Board.new(10, 10, "dumbhash", "system")
     {:ok, new_tile1} = TileNew.new(:sticker)
     {:ok, new_tile2} = TileNew.new(:card)
 
-    {:ok, board} = BoardNew.place_tile(board, new_tile1, {8, 8})
-    {:ok, board} = BoardNew.place_tile(board, new_tile2, {0, 0})
+    {:ok, board} = Board.place_tile(board, new_tile1, {8, 8})
+    {:ok, board} = Board.place_tile(board, new_tile2, {0, 0})
 
     #tile1
-    case BoardNew.pick_tile(board, {9, 9}) do
+    case Board.pick_tile(board, {9, 9}) do
       {:error, :no_tile_there} -> assert false
-      {:ok, tile} -> assert true
+      {:ok, _tile} -> assert true
     end
 
-    {:ok, board, tile} = BoardNew.remove_tile(board, {9, 9}) #sticker
+    {:ok, board, tile} = Board.remove_tile(board, {9, 9}) #sticker
     assert tile.tile_hash == new_tile1.tile_hash
 
-    case BoardNew.pick_tile(board, {9, 9}) do
+    case Board.pick_tile(board, {9, 9}) do
       {:error, :no_tile_there} -> assert true
-      {:ok, tile} -> assert false
+      {:ok, _tile} -> assert false
     end
 
 #tile2
-    case BoardNew.pick_tile(board, {0, 0}) do
+    case Board.pick_tile(board, {0, 0}) do
       {:error, :no_tile_there} -> assert false
-      {:ok, tile} -> assert true
+      {:ok, _tile} -> assert true
     end
-    case BoardNew.pick_tile(board, {0, 1}) do
+    case Board.pick_tile(board, {0, 1}) do
       {:error, :no_tile_there} -> assert false
-      {:ok, tile} -> assert true
+      {:ok, _tile} -> assert true
     end
-    case BoardNew.pick_tile(board, {0, 2}) do
+    case Board.pick_tile(board, {0, 2}) do
       {:error, :no_tile_there} -> assert false
-      {:ok, tile} -> assert true
+      {:ok, _tile} -> assert true
     end
-    case BoardNew.pick_tile(board, {0, 3}) do
+    case Board.pick_tile(board, {0, 3}) do
       {:error, :no_tile_there} -> assert false
-      {:ok, tile} -> assert true
+      {:ok, _tile} -> assert true
     end
-    case BoardNew.pick_tile(board, {2, 3}) do
+    case Board.pick_tile(board, {2, 3}) do
       {:error, :no_tile_there} -> assert false
-      {:ok, tile} -> assert true
+      {:ok, _tile} -> assert true
     end
 
-    {:ok, board, tile} = BoardNew.remove_tile(board, {0, 0}) #sticker
+    {:ok, board, tile} = Board.remove_tile(board, {0, 0}) #sticker
     assert tile.tile_hash == new_tile2.tile_hash
 
-
-    case BoardNew.pick_tile(board, {0, 0}) do
+    case Board.pick_tile(board, {0, 0}) do
       {:error, :no_tile_there} -> assert true
-      {:ok, tile} -> assert false
+      {:ok, _tile} -> assert false
     end
-    case BoardNew.pick_tile(board, {0, 1}) do
+    case Board.pick_tile(board, {0, 1}) do
       {:error, :no_tile_there} -> assert true
-      {:ok, tile} -> assert false
+      {:ok, _tile} -> assert false
     end
-    case BoardNew.pick_tile(board, {0, 2}) do
+    case Board.pick_tile(board, {0, 2}) do
       {:error, :no_tile_there} -> assert true
-      {:ok, tile} -> assert false
+      {:ok, _tile} -> assert false
     end
-    case BoardNew.pick_tile(board, {0, 3}) do
+    case Board.pick_tile(board, {0, 3}) do
       {:error, :no_tile_there} -> assert true
-      {:ok, tile} -> assert false
+      {:ok, _tile} -> assert false
     end
-    case BoardNew.pick_tile(board, {2, 3}) do
+    case Board.pick_tile(board, {2, 3}) do
       {:error, :no_tile_there} -> assert true
-      {:ok, tile} -> assert false
+      {:ok, _tile} -> assert false
     end
   end
 end
