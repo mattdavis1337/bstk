@@ -112,7 +112,7 @@ defmodule Bstk.BoardSupervisor do
     board_wrapper = %{
       process_id: 1,
       name: "main_gameboard",
-      board: Board.new(12, 12, "main_gameboard", "system_generated_this_board_on_init"),
+      board: Board.new(100, 100, "main_gameboard", "system_generated_this_board_on_init"),
       rules: BoardRules.new(),
       players: []
     }
@@ -124,6 +124,30 @@ defmodule Bstk.BoardSupervisor do
 
     {:ok, new_board} = case Map.fetch(board_wrapper, :board) do
       {:ok, new_board} -> {:ok, _new_tile} = Board.place_tile(new_board, tile, {4, 5});
+      :error -> {:ok, board_wrapper}
+    end
+    board_wrapper = Map.put(board_wrapper, :board, new_board);
+
+    {:ok, new_board} = case Map.fetch(board_wrapper, :board) do
+      {:ok, new_board} -> {:ok, _new_tile} = Board.place_tile(new_board, tile, {50, 50});
+      :error -> {:ok, board_wrapper}
+    end
+    board_wrapper = Map.put(board_wrapper, :board, new_board);
+
+    {:ok, new_board} = case Map.fetch(board_wrapper, :board) do
+      {:ok, new_board} -> {:ok, _new_tile} = Board.place_tile(new_board, tile, {75, 75});
+      :error -> {:ok, board_wrapper}
+    end
+    board_wrapper = Map.put(board_wrapper, :board, new_board);
+
+    {:ok, new_board} = case Map.fetch(board_wrapper, :board) do
+      {:ok, new_board} -> {:ok, _new_tile} = Board.place_tile(new_board, tile, {85, 85});
+      :error -> {:ok, board_wrapper}
+    end
+    board_wrapper = Map.put(board_wrapper, :board, new_board);
+
+    {:ok, new_board} = case Map.fetch(board_wrapper, :board) do
+      {:ok, new_board} -> {:ok, _new_tile} = Board.place_tile(new_board, tile, {99, 99});
       :error -> {:ok, board_wrapper}
     end
     board_wrapper = Map.put(board_wrapper, :board, new_board);
@@ -146,7 +170,6 @@ defmodule Bstk.BoardSupervisor do
     end
     board_wrapper = Map.put(board_wrapper, :board, new_board);
 
-
     board_wrapper2 = %{
       process_id: 2,
       name: "sub_board",
@@ -158,7 +181,6 @@ defmodule Bstk.BoardSupervisor do
     children = [
       worker(Bstk.BoardServer, [], restart: :permanent)
     ]
-
 
     :ets.insert(:game_state, {board_wrapper.process_id, board_wrapper})
     :ets.insert(:game_state, {board_wrapper2.process_id, board_wrapper2})
