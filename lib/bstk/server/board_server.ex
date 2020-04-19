@@ -78,6 +78,7 @@ defp via_tuple(process_id), do: {:via, Registry, {@board_registry_name, process_
   end
 
   def handle_call({:add_player, player_name}, _from, state_data) do
+    IO.inspect("adding player #{player_name}")
     with {:ok, rules} <- BoardRules.check(state_data.rules, :user_action@add_player)
     do
       state_data

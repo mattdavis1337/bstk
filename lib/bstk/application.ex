@@ -11,8 +11,10 @@ defmodule Bstk.Application do
     children = [
       # Starts a worker by calling: Bstk.Worker.start_link(arg)
       # {Bstk.Worker, arg},
+      #%{ id: "frequent", start: {SchedEx, :run_every, [Bstk.BoardServer.player_joined(1, "charles"), :do_frequent, [], "*/1 * * * *"]}, time_scale: Bstk.TimeScale },
       supervisor(Registry, [:unique, :board_process_registry]),
-      supervisor(Bstk.BoardSupervisor, [])
+      supervisor(Bstk.BoardSupervisor, []),
+      supervisor(Bstk.GameTimer, ["game_queue"])
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
